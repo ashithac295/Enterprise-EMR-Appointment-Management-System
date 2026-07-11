@@ -18,6 +18,6 @@ export const upsertSchedule = asyncHandler(async (req: Request, res: Response) =
     slotDuration,
     breakTimings
   });
-  await createAuditLog(req.user!.id, req.user!.name, req.user!.role, 'Configure Schedule', `Doctor: ${doctorId}`);
+  await createAuditLog(req.user!._id, req.user!.name, req.user!.role, 'Configure Schedule', `Doctor: ${doctorId}`);
   sendSuccess(res, 200, 'Doctor schedule configured successfully', schedule);
 });
