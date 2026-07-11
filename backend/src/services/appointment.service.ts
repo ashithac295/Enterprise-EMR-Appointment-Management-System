@@ -171,14 +171,14 @@ export async function getAppointmentById(id: string): Promise<IAppointment> {
 }
 
 export async function updateAppointment(
-  id: string,
-  requester: { id: string; role: string },
+  _id: string,
+  requester: { _id: string; role: string },
   updates: { purpose?: string; notes?: string; status?: AppointmentStatus }
 ): Promise<IAppointment> {
-  const appt = await Appointment.findById(id);
+  const appt = await Appointment.findById(_id);
   if (!appt) throw ApiError.notFound('Appointment not found.');
 
-  if (requester.role === 'Doctor' && appt.doctorId.toString() !== requester.id) {
+  if (requester.role === 'Doctor' && appt.doctorId.toString() !== requester._id) {
     throw ApiError.forbidden('You can only update your own appointments.');
   }
 

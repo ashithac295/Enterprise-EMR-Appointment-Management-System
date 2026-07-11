@@ -8,10 +8,10 @@ import { broadcastAppointmentUpdate } from '../sockets';
 export const createAppointment = asyncHandler(async (req: Request, res: Response) => {
   const appointment = await appointmentService.bookAppointment({
     ...req.body,
-    bookedBy: { userId: req.user!.id, name: req.user!.name, role: req.user!.role }
+    bookedBy: { userId: req.user!._id, name: req.user!.name, role: req.user!.role }
   });
 
-  await createAuditLog(req.user!.id, req.user!.name, req.user!.role, 'Appointment Created', `Appointment: ${appointment._id}`);
+  await createAuditLog(req.user!._id, req.user!.name, req.user!.role, 'Appointment Created', `Appointment: ${appointment._id}`);
   broadcastAppointmentUpdate('CREATED', appointment);
 
   sendSuccess(res, 201, 'Appointment booked successfully', appointment);
@@ -24,7 +24,7 @@ export const listAppointments = asyncHandler(async (req: Request, res: Response)
 
   const { results, meta } = await appointmentService.listAppointments({
     requesterRole: req.user!.role,
-    requesterId: req.user!.id,
+    requesterId: req.user!._id,
     search: search ? String(search) : undefined,
     department: department ? String(department) : undefined,
     status: status ? String(status) : undefined,
@@ -43,12 +43,12 @@ export const updateAppointment = asyncHandler(async (req: Request, res: Response
   const { purpose, notes, status } = req.body;
   const updated = await appointmentService.updateAppointment(
     req.params.id,
-    { id: req.user!.id, role: req.user!.role },
+    { _id: req.user!._id, role: req.user!.role },
     { purpose, notes, status }
   );
 
   await createAuditLog(
-    req.user!.id,
+    req.user!._id,
     req.user!.name,
     req.user!.role,
     'Appointment Updated',
@@ -62,7 +62,7 @@ export const updateAppointment = asyncHandler(async (req: Request, res: Response
 export const cancelAppointment = asyncHandler(async (req: Request, res: Response) => {
   const cancelled = await appointmentService.cancelAppointment(req.params.id);
 
-  await createAuditLog(req.user!.id, req.user!.name, req.user!.role, 'Appointment Cancelled', `Appointment: ${cancelled._id}`);
+  await createAuditLog(req.user!._id, req.user!.name, req.user!.role, 'Appointment Cancelled', `Appointment: ${cancelled._id}`);
   broadcastAppointmentUpdate('CANCELLED', cancelled);
 
   sendSuccess(res, 200, 'Appointment cancelled successfully', cancelled);
@@ -71,7 +71,7 @@ export const cancelAppointment = asyncHandler(async (req: Request, res: Response
 export const arriveAppointment = asyncHandler(async (req: Request, res: Response) => {
   const updated = await appointmentService.markArrived(req.params.id);
 
-  await createAuditLog(req.user!.id, req.user!.name, req.user!.role, 'Patient Arrived', `Appointment: ${updated._id}`);
+  await createAuditLog(req.user!._id, req.user!.name, req.user!.role, 'Patient Arrived', `Appointment: ${updated._id}`);
   broadcastAppointmentUpdate('UPDATED', updated);
 
   sendSuccess(res, 200, 'Patient marked as arrived successfully', updated);

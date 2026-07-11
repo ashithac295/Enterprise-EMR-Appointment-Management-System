@@ -19,7 +19,7 @@ function msFromExpiry(expiresIn: string): number {
 }
 
 function buildTokenPayload(user: IUser) {
-  return { id: user._id.toString(), email: user.email, role: user.role, name: user.name };
+  return { _id:user._id.toString(), email: user.email, role: user.role, name: user.name };
 }
 
 function signAccessToken(user: IUser): string {
@@ -29,7 +29,7 @@ function signAccessToken(user: IUser): string {
 }
 
 function signRefreshToken(user: IUser): string {
-  return jwt.sign({ id: user._id.toString() }, env.jwt.refreshSecret, {
+  return jwt.sign({ _id:user._id.toString() }, env.jwt.refreshSecret, {
     expiresIn: env.jwt.refreshExpiresIn
   } as SignOptions);
 }
@@ -61,7 +61,7 @@ export async function login(email: string, password: string) {
     accessToken,
     refreshToken,
     user: {
-      id: user._id,
+      _id:user._id,
       email: user.email,
       name: user.name,
       role: user.role,
@@ -76,16 +76,16 @@ export async function refreshAccessToken(refreshToken: string) {
     throw ApiError.unauthorized('Invalid or expired refresh token.');
   }
 
-  let payload: { id: string };
+  let payload: { _id:string };
   try {
-    payload = jwt.verify(refreshToken, env.jwt.refreshSecret) as { id: string };
+    payload = jwt.verify(refreshToken, env.jwt.refreshSecret) as { _id:string };
   } catch {
     // Token is malformed/expired at the JWT level - clean up the stale DB record too
     await RefreshToken.deleteOne({ token: refreshToken });
     throw ApiError.unauthorized('Invalid or expired refresh token.');
   }
 
-  const user = await User.findOne({ _id: payload.id, isActive: true });
+  const user = await User.findOne({ _id: payload._id, isActive: true });
   if (!user) {
     throw ApiError.unauthorized('User not found.');
   }

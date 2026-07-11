@@ -5,7 +5,7 @@ import { ApiError } from '../utils/ApiError';
 import { UserRole } from '../models/User.model';
 
 export interface JwtUserPayload {
-  id: string;
+  _id: string;
   email: string;
   role: UserRole;
   name: string;

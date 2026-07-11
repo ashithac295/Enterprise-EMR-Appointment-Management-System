@@ -12,7 +12,7 @@ export const getDoctors = asyncHandler(async (_req: Request, res: Response) => {
 export const createDoctor = asyncHandler(async (req: Request, res: Response) => {
   const { email, password, name, specialty, department } = req.body;
   const doctor = await doctorService.createDoctor({ email, password, name, specialty, department });
-  await createAuditLog(req.user!.id, req.user!.name, req.user!.role, 'Create Doctor', `Doctor: ${doctor._id}`);
+  await createAuditLog(req.user!._id, req.user!.name, req.user!.role, 'Create Doctor', `Doctor: ${doctor._id}`);
   sendSuccess(res, 201, 'Doctor account created successfully', doctor);
 });
 
@@ -20,7 +20,7 @@ export const createReceptionist = asyncHandler(async (req: Request, res: Respons
   const { email, password, name } = req.body;
   const receptionist = await doctorService.createReceptionist({ email, password, name });
   await createAuditLog(
-    req.user!.id,
+    req.user!._id,
     req.user!.name,
     req.user!.role,
     'Create Receptionist',
