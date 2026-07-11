@@ -1,12 +1,22 @@
 import { Patient } from '../models/Patient.model';
+import { Appointment } from '../models/Appointment.model';
 import { generatePublicId } from '../utils/generateId';
 
-export async function searchPatients(search?: string) {
-  if (!search) {
-    return Patient.find().sort({ createdAt: -1 }).limit(50);
+export async function searchPatients(search?: string, doctorId?: string) {
+  let filter: Record<string, any> = {};
+
+  if (doctorId) {
+    const patientIds = await Appointment.find({ doctorId }).distinct('patientId');
+    filter._id = { $in: patientIds };
   }
+
+  if (!search) {
+    return Patient.find(filter).sort({ createdAt: -1 }).limit(50);
+  }
+
   const regex = new RegExp(search.trim(), 'i');
   return Patient.find({
+    ...filter,
     $or: [{ name: regex }, { mobile: regex }, { publicId: regex }]
   }).limit(50);
 }
