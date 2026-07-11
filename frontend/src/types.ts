@@ -42,7 +42,7 @@ export interface DoctorSchedule {
 export type AppointmentStatus = 'Scheduled' | 'Arrived' | 'Completed' | 'Cancelled';
 
 export interface Appointment {
-  _id:string;
+  _id: string;
   patientId: string;
   patientName: string;
   patientMobile: string;
@@ -66,8 +66,8 @@ export interface Appointment {
 }
 
 export interface Patient {
-  _id:string;
-  publicId: string;
+  _id: string;
+  publicId: string; // friendly display id, e.g. PAT-482913
   name: string;
   mobile: string;
   email?: string;
@@ -75,7 +75,7 @@ export interface Patient {
 }
 
 export interface AuditLog {
-  _id:string;
+  _id: string;
   userId: string;
   userName: string;
   userRole: UserRole;

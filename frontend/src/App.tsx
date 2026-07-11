@@ -7,9 +7,10 @@ import AppointmentScheduler from './components/AppointmentScheduler';
 import AppointmentList from './components/AppointmentList';
 import DoctorSchedules from './components/DoctorSchedules';
 import AuditLogs from './components/AuditLogs';
-import { 
-  Activity, LogOut, User, Shield, Briefcase, Calendar, 
-  Users, RefreshCw, Terminal, Bell, FileSpreadsheet, Menu, X
+import Patients from './components/Patients';
+import {
+  Activity, LogOut, User, Shield, Briefcase, Calendar,
+  Users, RefreshCw, Terminal, Bell, FileSpreadsheet, Menu, X, ClipboardList
 } from 'lucide-react';
 import { io } from 'socket.io-client';
 import { motion, AnimatePresence } from 'motion/react';
@@ -28,18 +29,18 @@ const queryClient = new QueryClient({
 // Helper component for role-based route guard
 function RoleGuard({ allowedRoles, children }: { allowedRoles: string[]; children: React.ReactNode }) {
   const { user } = useAuth();
-  
+
   if (!user || !allowedRoles.includes(user.role)) {
     return <Navigate to="/dashboard" replace />;
   }
-  
+
   return <>{children}</>;
 }
 
 // Protected Route Wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
-  
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-500">
@@ -47,18 +48,18 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-  
+
   if (!user) {
     return <Navigate to="/login" replace />;
   }
-  
+
   return <>{children}</>;
 }
 
 // Public/Login Route Wrapper
 function LoginRoute() {
   const { user, loading } = useAuth();
-  
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-500">
@@ -66,21 +67,22 @@ function LoginRoute() {
       </div>
     );
   }
-  
+
   if (user) {
     return <Navigate to="/dashboard" replace />;
   }
-  
+
   return <Login />;
 }
 
 // Navigation sidebar items setup
 const navItems = [
-  { _id:'dashboard', label: 'Clinical Hub', icon: Activity, roles: ['Super Admin', 'Receptionist', 'Doctor'], path: '/dashboard' },
-  { _id:'scheduler', label: 'Book Scheduler', icon: Calendar, roles: ['Super Admin', 'Receptionist'], path: '/scheduler' },
-  { _id:'list', label: 'Appointments Registry', icon: FileSpreadsheet, roles: ['Super Admin', 'Receptionist', 'Doctor'], path: '/appointments' },
-  { _id:'schedules', label: 'Practitioners & Shifts', icon: Users, roles: ['Super Admin'], path: '/schedules' },
-  { _id:'logs', label: 'Security Audit', icon: Terminal, roles: ['Super Admin'], path: '/audit-logs' },
+  { _id: 'dashboard', label: 'Clinical Hub', icon: Activity, roles: ['Super Admin', 'Receptionist', 'Doctor'], path: '/dashboard' },
+  { _id: 'scheduler', label: 'Book Scheduler', icon: Calendar, roles: ['Super Admin', 'Receptionist'], path: '/scheduler' },
+  { _id: 'list', label: 'Appointments Registry', icon: FileSpreadsheet, roles: ['Super Admin', 'Receptionist', 'Doctor'], path: '/appointments' },
+  { _id: 'schedules', label: 'Practitioners & Shifts', icon: Users, roles: ['Super Admin'], path: '/schedules' },
+  { _id: 'patients', label: 'Patient Directory', icon: ClipboardList, roles: ['Super Admin', 'Receptionist'] , path: '/patients' },
+  { _id: 'logs', label: 'Security Audit', icon: Terminal, roles: ['Super Admin'], path: '/audit-logs' },
 ];
 
 function AppShell() {
@@ -100,12 +102,12 @@ function AppShell() {
 
     socket.on('appointment_updated', (data: { action: string; appointment: any }) => {
       console.log('Real-time appointment notification received:', data);
-      
+
       // Leverage React Query client to automatically invalidate affected caches
       queryClientInstance.invalidateQueries({ queryKey: ['appointments'] });
       queryClientInstance.invalidateQueries({ queryKey: ['slots'] });
       queryClientInstance.invalidateQueries({ queryKey: ['audit-logs'] });
-      
+
       // Trigger live banner toast
       let verb = 'modified';
       if (data.action === 'CREATED') verb = 'booked';
@@ -151,11 +153,10 @@ function AppShell() {
               id={`nav_tab_${nav._id}`}
               to={nav.path}
               onClick={() => setMobileSidebarOpen(false)}
-              className={({ isActive }) => 
-                `w-full flex items-center gap-3 px-3 py-2 rounded text-xs font-semibold transition-all ${
-                  isActive
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
+              className={({ isActive }) =>
+                `w-full flex items-center gap-3 px-3 py-2 rounded text-xs font-semibold transition-all ${isActive
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
                 }`
               }
             >
@@ -183,7 +184,7 @@ function AppShell() {
               </p>
             </div>
           </div>
-          
+
           <button
             id="header_logout_btn"
             onClick={logout}
@@ -216,7 +217,7 @@ function AppShell() {
               onClick={() => setMobileSidebarOpen(false)}
               className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs"
             />
-            
+
             {/* Sidebar container */}
             <motion.div
               initial={{ x: '-100%' }}
@@ -258,7 +259,7 @@ function AppShell() {
             <div className="h-4 w-[1px] bg-slate-200"></div>
             <div className="flex gap-2 text-[10px]">
               <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded font-bold">Online</span>
-              
+
             </div>
           </div>
 
@@ -272,7 +273,7 @@ function AppShell() {
 
         {/* Content body wrapper with nested router and transition animations */}
         <div className="flex-1 p-4 md:p-6 overflow-y-auto space-y-4" id="main_content_body_scroller">
-          
+
           {/* Live Updates Notification Toast */}
           <AnimatePresence>
             {liveNotification && (
@@ -311,7 +312,7 @@ function AppShell() {
         {/* Bottom Status Bar / Footer */}
         <footer className="h-8 bg-white border-t border-slate-200 px-6 flex items-center justify-between shrink-0" id="app_footer">
           <div className="flex items-center gap-6 text-[9px] text-slate-400">
-           
+
           </div>
           <div className="text-[9px] text-slate-400 font-semibold">
             Appointment Management System
@@ -325,7 +326,7 @@ function AppShell() {
 // Sub-component for Dashboard screen
 function Dashboard() {
   const { user } = useAuth();
-  
+
   if (!user) return null;
 
   return (
@@ -413,24 +414,28 @@ export default function App() {
             <Route path="/" element={<ProtectedRoute><AppShell /></ProtectedRoute>}>
               {/* Default Redirect to Dashboard */}
               <Route index element={<Navigate to="/dashboard" replace />} />
-              
+
               {/* View Components mapping */}
               <Route path="dashboard" element={<Dashboard />} />
-              
+
               <Route path="scheduler" element={
                 <RoleGuard allowedRoles={['Super Admin', 'Receptionist']}>
                   <AppointmentScheduler />
                 </RoleGuard>
               } />
-              
+
               <Route path="appointments" element={<AppointmentList refreshTrigger={0} />} />
-              
+
               <Route path="schedules" element={
                 <RoleGuard allowedRoles={['Super Admin']}>
                   <DoctorSchedules />
                 </RoleGuard>
               } />
-              
+              <Route path="patients" element={
+                <RoleGuard allowedRoles={['Super Admin', 'Receptionist']}>
+                  <Patients />
+                </RoleGuard>
+              } />
               <Route path="audit-logs" element={
                 <RoleGuard allowedRoles={['Super Admin']}>
                   <AuditLogs />

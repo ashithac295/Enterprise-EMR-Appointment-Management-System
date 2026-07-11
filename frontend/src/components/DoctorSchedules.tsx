@@ -7,14 +7,14 @@ import { motion } from 'motion/react';
 export default function DoctorSchedules() {
   const [doctors, setDoctors] = useState<User[]>([]);
   const [selectedDoctorId, setSelectedDoctorId] = useState('');
-  
+
   // Create Doctor Account States
   const [docEmail, setDocEmail] = useState('');
   const [docPassword, setDocPassword] = useState('');
   const [docName, setDocName] = useState('');
   const [docSpecialty, setDocSpecialty] = useState('');
   const [docDepartment, setDocDepartment] = useState('Internal Medicine');
-  
+
   const [creatingDoc, setCreatingDoc] = useState(false);
   const [createDocSuccess, setCreateDocSuccess] = useState<string | null>(null);
   const [createDocError, setCreateDocError] = useState<string | null>(null);
@@ -24,10 +24,17 @@ export default function DoctorSchedules() {
   const [slotDuration, setSlotDuration] = useState(15);
   const [sessions, setSessions] = useState<Session[]>([]);
   const [breaks, setBreaks] = useState<BreakTiming[]>([]);
-  
+
   const [configuringSched, setConfiguringSched] = useState(false);
   const [schedSuccess, setSchedSuccess] = useState<string | null>(null);
   const [schedError, setSchedError] = useState<string | null>(null);
+
+  const [recepName, setRecepName] = useState('');
+  const [recepEmail, setRecepEmail] = useState('');
+  const [recepPassword, setRecepPassword] = useState('');
+  const [creatingRecep, setCreatingRecep] = useState(false);
+  const [createRecepSuccess, setCreateRecepSuccess] = useState<string | null>(null);
+  const [createRecepError, setCreateRecepError] = useState<string | null>(null);
 
   const loadDoctors = async () => {
     try {
@@ -121,7 +128,37 @@ export default function DoctorSchedules() {
       setCreatingDoc(false);
     }
   };
+  const handleCreateReceptionist = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!recepEmail || !recepPassword || !recepName) {
+      setCreateRecepError('All fields are required.');
+      return;
+    }
 
+    setCreatingRecep(true);
+    setCreateRecepError(null);
+    setCreateRecepSuccess(null);
+
+    try {
+      const res = await apiRequest('/api/v1/admin/receptionists', {
+        method: 'POST',
+        body: JSON.stringify({ email: recepEmail, password: recepPassword, name: recepName })
+      });
+
+      if (res.success) {
+        setCreateRecepSuccess('Receptionist account created successfully!');
+        setRecepEmail('');
+        setRecepPassword('');
+        setRecepName('');
+      } else {
+        setCreateRecepError(res.message || 'Failed to create receptionist account.');
+      }
+    } catch (err: any) {
+      setCreateRecepError(err.message || 'Failed to create receptionist account.');
+    } finally {
+      setCreatingRecep(false);
+    }
+  };
   const handleToggleDay = (day: number) => {
     if (workingDays.includes(day)) {
       setWorkingDays(workingDays.filter(d => d !== day));
@@ -319,7 +356,82 @@ export default function DoctorSchedules() {
           </button>
         </form>
       </div>
+      {/* 1b. Create Receptionist Account */}
+      <div className="bg-white rounded border border-slate-200 p-4 flex flex-col h-fit shadow-sm">
+        <h3 className="text-xs font-bold font-display text-slate-800 flex items-center gap-2 mb-1 uppercase tracking-wider">
+          <UserCheck className="h-4 w-4 text-teal-600" />
+          Onboard Receptionist
+        </h3>
+        <p className="text-[10px] text-slate-400 mb-4">
+          Provision front-desk login credentials for a new Receptionist.
+        </p>
 
+        {createRecepSuccess && (
+          <div className="mb-4 p-3 bg-emerald-50 border border-emerald-100 text-emerald-800 text-[10px] rounded font-semibold flex items-center gap-2" id="create_recep_success_banner">
+            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+            <p>{createRecepSuccess}</p>
+          </div>
+        )}
+
+        {createRecepError && (
+          <div className="mb-4 p-3 bg-rose-50 border border-rose-100 text-rose-800 text-[10px] rounded font-semibold flex items-center gap-2" id="create_recep_error_banner">
+            <Shield className="h-4 w-4 text-rose-500" />
+            <p>{createRecepError}</p>
+          </div>
+        )}
+
+        <form onSubmit={handleCreateReceptionist} className="space-y-3">
+          <div>
+            <label className="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1">Full Name</label>
+            <input
+              id="recep_onboard_name_input"
+              type="text"
+              required
+              value={recepName}
+              onChange={(e) => setRecepName(e.target.value)}
+              placeholder="Jane Doe"
+              className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs focus:bg-white focus:outline-none transition-all text-slate-800"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1">Email Address</label>
+              <input
+                id="recep_onboard_email_input"
+                type="email"
+                required
+                value={recepEmail}
+                onChange={(e) => setRecepEmail(e.target.value)}
+                placeholder="receptionist@emr.com"
+                className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs focus:bg-white focus:outline-none transition-all text-slate-800"
+              />
+            </div>
+            <div>
+              <label className="block text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1">Password (min. 8 chars)</label>
+              <input
+                id="recep_onboard_password_input"
+                type="password"
+                required
+                minLength={8}
+                value={recepPassword}
+                onChange={(e) => setRecepPassword(e.target.value)}
+                placeholder="Securepassword"
+                className="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded text-xs focus:bg-white focus:outline-none transition-all text-slate-800"
+              />
+            </div>
+          </div>
+
+          <button
+            id="recep_onboard_submit_btn"
+            type="submit"
+            disabled={creatingRecep}
+            className="w-full py-2 bg-teal-600 hover:bg-teal-700 text-white rounded font-semibold text-xs transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer"
+          >
+            {creatingRecep ? 'Onboarding...' : 'Onboard Receptionist & Create Login'}
+          </button>
+        </form>
+      </div>
       {/* 2. Configure Doctor Schedule */}
       <div className="bg-white rounded border border-slate-200 p-4 flex flex-col shadow-sm">
         <h3 className="text-xs font-bold font-display text-slate-800 flex items-center gap-2 mb-1 uppercase tracking-wider">
@@ -370,11 +482,10 @@ export default function DoctorSchedules() {
                   id={`bubble_day_${day.value}`}
                   type="button"
                   onClick={() => handleToggleDay(day.value)}
-                  className={`w-7 h-7 rounded font-bold text-[10px] border flex items-center justify-center transition-all cursor-pointer ${
-                    workingDays.includes(day.value)
+                  className={`w-7 h-7 rounded font-bold text-[10px] border flex items-center justify-center transition-all cursor-pointer ${workingDays.includes(day.value)
                       ? 'bg-blue-600 text-white border-blue-600'
                       : 'bg-slate-50 text-slate-400 border-slate-200 hover:bg-slate-100'
-                  }`}
+                    }`}
                 >
                   {day.label}
                 </button>
