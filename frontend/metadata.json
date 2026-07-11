@@ -1,0 +1,5 @@
+{
+  "name": "EMR Appointment Management System",
+  "description": "Enterprise EMR Appointment Management System with dynamic slot generation, RBAC, and real-time updates.",
+  "requestFramePermissions": []
+}
