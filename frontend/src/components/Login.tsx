@@ -29,18 +29,6 @@ export default function Login() {
     }
   };
 
-  const setDemoCredentials = (role: 'admin' | 'receptionist' | 'doctor') => {
-    if (role === 'admin') {
-      setEmail('admin@emr.com');
-      setPassword('adminpassword');
-    } else if (role === 'receptionist') {
-      setEmail('receptionist@emr.com');
-      setPassword('receptionistpassword');
-    } else if (role === 'doctor') {
-      setEmail('doctor@emr.com');
-      setPassword('doctorpassword');
-    }
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F1F5F9] px-4 py-8 font-sans" id="login_container">
@@ -132,38 +120,6 @@ export default function Login() {
             </button>
           </form>
 
-          {/* Demonstration Quick-Logins */}
-          <div className="mt-6 pt-5 border-t border-slate-200">
-            <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider text-center mb-2.5">
-              Assessment Sandbox Accounts
-            </span>
-            <div className="grid grid-cols-3 gap-1.5" id="sandbox_logins">
-              <button
-                id="demo_admin_btn"
-                type="button"
-                onClick={() => setDemoCredentials('admin')}
-                className="py-1.5 px-1 text-[10px] border border-slate-200 hover:border-blue-500 hover:bg-blue-50 rounded font-semibold text-slate-600 hover:text-blue-700 transition-all cursor-pointer"
-              >
-                Super Admin
-              </button>
-              <button
-                id="demo_receptionist_btn"
-                type="button"
-                onClick={() => setDemoCredentials('receptionist')}
-                className="py-1.5 px-1 text-[10px] border border-slate-200 hover:border-teal-500 hover:bg-teal-50 rounded font-semibold text-slate-600 hover:text-teal-700 transition-all cursor-pointer"
-              >
-                Receptionist
-              </button>
-              <button
-                id="demo_doctor_btn"
-                type="button"
-                onClick={() => setDemoCredentials('doctor')}
-                className="py-1.5 px-1 text-[10px] border border-slate-200 hover:border-violet-500 hover:bg-violet-50 rounded font-semibold text-slate-600 hover:text-violet-700 transition-all cursor-pointer"
-              >
-                Doctor
-              </button>
-            </div>
-          </div>
         </div>
       </motion.div>
     </div>

@@ -81,7 +81,7 @@ const navItems = [
   { _id: 'scheduler', label: 'Book Scheduler', icon: Calendar, roles: ['Super Admin', 'Receptionist'], path: '/scheduler' },
   { _id: 'list', label: 'Appointments Registry', icon: FileSpreadsheet, roles: ['Super Admin', 'Receptionist', 'Doctor'], path: '/appointments' },
   { _id: 'schedules', label: 'Practitioners & Shifts', icon: Users, roles: ['Super Admin'], path: '/schedules' },
-  { _id: 'patients', label: 'Patient Directory', icon: ClipboardList, roles: ['Super Admin', 'Receptionist'] , path: '/patients' },
+  { _id: 'patients', label: 'Patient Directory', icon: ClipboardList, roles: ['Super Admin', 'Receptionist', 'Doctor'], path: '/patients' },
   { _id: 'logs', label: 'Security Audit', icon: Terminal, roles: ['Super Admin'], path: '/audit-logs' },
 ];
 
@@ -432,7 +432,7 @@ export default function App() {
                 </RoleGuard>
               } />
               <Route path="patients" element={
-                <RoleGuard allowedRoles={['Super Admin', 'Receptionist']}>
+                <RoleGuard allowedRoles={['Super Admin', 'Receptionist', 'Doctor']}>
                   <Patients />
                 </RoleGuard>
               } />
