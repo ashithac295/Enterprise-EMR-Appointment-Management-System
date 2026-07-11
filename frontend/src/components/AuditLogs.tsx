@@ -70,7 +70,7 @@ export default function AuditLogs() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {logs.map((log) => (
-                <tr key={log.id} className="hover:bg-slate-50/50 transition-all" id={`log_row_${log.id}`}>
+                <tr key={log._id} className="hover:bg-slate-50/50 transition-all" id={`log_row_${log._id}`}>
                   <td className="px-3 py-2 text-slate-400 font-medium">
                     {new Date(log.timestamp).toLocaleString()}
                   </td>

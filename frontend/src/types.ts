@@ -6,7 +6,7 @@
 export type UserRole = 'Super Admin' | 'Receptionist' | 'Doctor';
 
 export interface User {
-  id: string;
+  _id: string;
   email: string;
   name: string;
   role: UserRole;
@@ -42,7 +42,7 @@ export interface DoctorSchedule {
 export type AppointmentStatus = 'Scheduled' | 'Arrived' | 'Completed' | 'Cancelled';
 
 export interface Appointment {
-  id: string;
+  _id:string;
   patientId: string;
   patientName: string;
   patientMobile: string;
@@ -66,7 +66,7 @@ export interface Appointment {
 }
 
 export interface Patient {
-  id: string;
+  _id:string;
   publicId: string;
   name: string;
   mobile: string;
@@ -75,7 +75,7 @@ export interface Patient {
 }
 
 export interface AuditLog {
-  id: string;
+  _id:string;
   userId: string;
   userName: string;
   userRole: UserRole;

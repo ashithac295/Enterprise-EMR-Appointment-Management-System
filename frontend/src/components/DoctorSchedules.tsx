@@ -35,7 +35,7 @@ export default function DoctorSchedules() {
       if (res.success && res.data) {
         setDoctors(res.data);
         if (res.data.length > 0 && !selectedDoctorId) {
-          setSelectedDoctorId(res.data[0].id);
+          setSelectedDoctorId(res.data[0]._id);
         }
       }
     } catch (err) {

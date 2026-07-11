@@ -12,7 +12,7 @@ interface Slot {
 }
 
 interface Patient {
-  id: string;
+  _id:string;
   publicId: string; 
   name: string;
   mobile: string;
@@ -61,7 +61,7 @@ export default function AppointmentScheduler({ onBookingSuccess }: { onBookingSu
   // Set default selected doctor once doctors list loads
   useEffect(() => {
     if (doctors.length > 0 && !selectedDoctorId) {
-      setSelectedDoctorId(doctors[0].id);
+      setSelectedDoctorId(doctors[0]._id);
     }
   }, [doctors, selectedDoctorId]);
 
@@ -148,7 +148,7 @@ export default function AppointmentScheduler({ onBookingSuccess }: { onBookingSu
 
     const payload = {
       patientType,
-      patientId: patientType === 'Existing' ? selectedPatient?.id : undefined,
+      patientId: patientType === 'Existing' ? selectedPatient?._id : undefined,
       patientName,
       patientMobile,
       patientEmail: patientEmail || undefined,
@@ -192,7 +192,7 @@ export default function AppointmentScheduler({ onBookingSuccess }: { onBookingSu
   const morningSlots = slots.filter(s => parseInt(s.time.split(':')[0]) < 12);
   const afternoonSlots = slots.filter(s => parseInt(s.time.split(':')[0]) >= 12);
 
-  const selectedDocDetails = doctors.find(d => d.id === selectedDoctorId);
+  const selectedDocDetails = doctors.find(d => d._id === selectedDoctorId);
 
   return (
     <div className="bg-white rounded-2xl border border-slate-100 p-6 md:p-8" id="appointment_scheduler_section">
@@ -218,7 +218,7 @@ export default function AppointmentScheduler({ onBookingSuccess }: { onBookingSu
               className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
             >
               {doctors.map(doc => (
-                <option key={doc.id} value={doc.id}>
+                <option key={doc._id} value={doc._id}>
                   {doc.name} ({doc.doctorInfo?.specialty || 'General'})
                 </option>
               ))}
@@ -460,8 +460,8 @@ export default function AppointmentScheduler({ onBookingSuccess }: { onBookingSu
                           <div className="border border-slate-100 rounded-xl bg-slate-50 max-h-40 overflow-y-auto divide-y divide-slate-100" id="patient_search_results">
                             {searchResults.map(p => (
                               <button
-                                key={p.id}
-                                id={`select_patient_btn_${p.id}`}
+                                key={p._id}
+                                id={`select_patient_btn_${p._id}`}
                                 type="button"
                                 onClick={() => handleSelectPatient(p)}
                                 className="w-full text-left px-4 py-2.5 hover:bg-white text-xs font-medium text-slate-700 flex justify-between items-center"

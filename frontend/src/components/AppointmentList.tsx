@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { apiRequest } from '../lib/api';
 import { useAuth } from '../lib/authContext';
 import { Appointment, AppointmentStatus } from '../types';
-import { 
-  Search, Filter, ArrowUpDown, ChevronLeft, ChevronRight, Edit2, CheckCircle2, XCircle, Info, CalendarClock, UserCheck 
+import {
+  Search, Filter, ArrowUpDown, ChevronLeft, ChevronRight, Edit2, CheckCircle2, XCircle, Info, CalendarClock, UserCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useQuery } from '@tanstack/react-query';
 
 export default function AppointmentList({ refreshTrigger }: { refreshTrigger: number }) {
   const { user } = useAuth();
-  
+
   // Search & Filters state
   const [search, setSearch] = useState('');
   const [department, setDepartment] = useState('');
@@ -19,7 +19,7 @@ export default function AppointmentList({ refreshTrigger }: { refreshTrigger: nu
   const [endDate, setEndDate] = useState('');
   const [sortBy, setSortBy] = useState('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  
+
   // Pagination State
   const [page, setPage] = useState(1);
   const limit = 10;
@@ -35,17 +35,18 @@ export default function AppointmentList({ refreshTrigger }: { refreshTrigger: nu
   const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ['appointments', { search, department, status, startDate, endDate, sortBy, sortOrder, page, refreshTrigger }],
     queryFn: async () => {
-      const queryParams = new URLSearchParams({
-        search,
-        department,
-        status,
-        startDate,
-        endDate,
-        sortBy,
-        sortOrder,
-        page: String(page),
-        limit: String(limit)
-      });
+      const queryParams = new URLSearchParams();
+
+      if (search) queryParams.append("search", search);
+      if (department) queryParams.append("department", department);
+      if (status) queryParams.append("status", status);
+      if (startDate) queryParams.append("startDate", startDate);
+      if (endDate) queryParams.append("endDate", endDate);
+
+      queryParams.append("sortBy", sortBy);
+      queryParams.append("sortOrder", sortOrder);
+      queryParams.append("page", String(page));
+      queryParams.append("limit", String(limit));
       const res = await apiRequest<Appointment[]>(`/api/v1/appointments?${queryParams.toString()}`);
       if (!res.success || !res.data) {
         throw new Error(res.message || 'Failed to fetch appointments.');
@@ -113,7 +114,7 @@ export default function AppointmentList({ refreshTrigger }: { refreshTrigger: nu
     setUpdateError(null);
 
     try {
-      const res = await apiRequest(`/api/v1/appointments/${editingAppt.id}`, {
+      const res = await apiRequest(`/api/v1/appointments/${editingAppt._id}`, {
         method: 'PUT',
         body: JSON.stringify({
           purpose: editPurpose,
@@ -295,7 +296,7 @@ export default function AppointmentList({ refreshTrigger }: { refreshTrigger: nu
             </thead>
             <tbody className="divide-y divide-slate-100 text-sm">
               {appointments.map((appt) => (
-                <tr key={appt.id} className="hover:bg-slate-50/50 transition-all duration-100" id={`appt_row_${appt.id}`}>
+                <tr key={appt._id} className="hover:bg-slate-50/50 transition-all duration-100" id={`appt_row_${appt._id}`}>
                   <td className="px-6 py-4">
                     <div>
                       <p className="font-bold text-slate-900">{appt.patientName}</p>
@@ -327,15 +328,15 @@ export default function AppointmentList({ refreshTrigger }: { refreshTrigger: nu
                     <span className={getStatusBadge(appt.status)}>{appt.status}</span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2" id={`appt_actions_${appt.id}`}>
+                    <div className="flex items-center justify-end gap-2" id={`appt_actions_${appt._id}`}>
                       {/* Workflow check actions */}
-                      
+
                       {/* Mark Arrived: Available for Super Admin & Receptionist only, and only if Scheduled */}
                       {user && (user.role === 'Super Admin' || user.role === 'Receptionist') && appt.status === 'Scheduled' && (
                         <button
-                          id={`arrive_btn_${appt.id}`}
+                          id={`arrive_btn_${appt._id}`}
                           title="Mark Arrived"
-                          onClick={() => handleMarkArrived(appt.id)}
+                          onClick={() => handleMarkArrived(appt._id)}
                           className="p-1.5 hover:bg-amber-100 text-amber-700 rounded-lg transition-all"
                         >
                           <UserCheck className="h-4 w-4" />
@@ -344,7 +345,7 @@ export default function AppointmentList({ refreshTrigger }: { refreshTrigger: nu
 
                       {/* Edit (Update notes, purpose, status): All roles but doctors restricted to their own */}
                       <button
-                        id={`edit_btn_${appt.id}`}
+                        id={`edit_btn_${appt._id}`}
                         title="Update details"
                         onClick={() => handleOpenEdit(appt)}
                         className="p-1.5 hover:bg-slate-100 text-slate-600 rounded-lg transition-all"
@@ -355,9 +356,9 @@ export default function AppointmentList({ refreshTrigger }: { refreshTrigger: nu
                       {/* Cancel: Super Admin & Receptionists only, if not terminal */}
                       {user && (user.role === 'Super Admin' || user.role === 'Receptionist') && appt.status !== 'Cancelled' && appt.status !== 'Completed' && (
                         <button
-                          id={`cancel_btn_${appt.id}`}
+                          id={`cancel_btn_${appt._id}`}
                           title="Cancel appointment"
-                          onClick={() => handleCancelAppointment(appt.id)}
+                          onClick={() => handleCancelAppointment(appt._id)}
                           className="p-1.5 hover:bg-rose-100 text-rose-600 rounded-lg transition-all"
                         >
                           <XCircle className="h-4 w-4" />

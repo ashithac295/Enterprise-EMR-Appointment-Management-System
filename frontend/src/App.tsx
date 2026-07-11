@@ -76,11 +76,11 @@ function LoginRoute() {
 
 // Navigation sidebar items setup
 const navItems = [
-  { id: 'dashboard', label: 'Clinical Hub', icon: Activity, roles: ['Super Admin', 'Receptionist', 'Doctor'], path: '/dashboard' },
-  { id: 'scheduler', label: 'Book Scheduler', icon: Calendar, roles: ['Super Admin', 'Receptionist'], path: '/scheduler' },
-  { id: 'list', label: 'Appointments Registry', icon: FileSpreadsheet, roles: ['Super Admin', 'Receptionist', 'Doctor'], path: '/appointments' },
-  { id: 'schedules', label: 'Practitioners & Shifts', icon: Users, roles: ['Super Admin'], path: '/schedules' },
-  { id: 'logs', label: 'Security Audit', icon: Terminal, roles: ['Super Admin'], path: '/audit-logs' },
+  { _id:'dashboard', label: 'Clinical Hub', icon: Activity, roles: ['Super Admin', 'Receptionist', 'Doctor'], path: '/dashboard' },
+  { _id:'scheduler', label: 'Book Scheduler', icon: Calendar, roles: ['Super Admin', 'Receptionist'], path: '/scheduler' },
+  { _id:'list', label: 'Appointments Registry', icon: FileSpreadsheet, roles: ['Super Admin', 'Receptionist', 'Doctor'], path: '/appointments' },
+  { _id:'schedules', label: 'Practitioners & Shifts', icon: Users, roles: ['Super Admin'], path: '/schedules' },
+  { _id:'logs', label: 'Security Audit', icon: Terminal, roles: ['Super Admin'], path: '/audit-logs' },
 ];
 
 function AppShell() {
@@ -147,8 +147,8 @@ function AppShell() {
           const Icon = nav.icon;
           return (
             <NavLink
-              key={nav.id}
-              id={`nav_tab_${nav.id}`}
+              key={nav._id}
+              id={`nav_tab_${nav._id}`}
               to={nav.path}
               onClick={() => setMobileSidebarOpen(false)}
               className={({ isActive }) => 
@@ -258,7 +258,7 @@ function AppShell() {
             <div className="h-4 w-[1px] bg-slate-200"></div>
             <div className="flex gap-2 text-[10px]">
               <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded font-bold">Online</span>
-              <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded font-bold hidden sm:inline-block">v2.5.0-Router-Query</span>
+              
             </div>
           </div>
 
@@ -311,17 +311,10 @@ function AppShell() {
         {/* Bottom Status Bar / Footer */}
         <footer className="h-8 bg-white border-t border-slate-200 px-6 flex items-center justify-between shrink-0" id="app_footer">
           <div className="flex items-center gap-6 text-[9px] text-slate-400">
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
-              <span>Database Connection Stable</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <svg className="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-              <span>SSL Encrypted Session</span>
-            </div>
+           
           </div>
           <div className="text-[9px] text-slate-400 font-semibold">
-            React Router & TanStack Query Enabled Enterprise Portal
+            Appointment Management System
           </div>
         </footer>
       </main>
@@ -396,10 +389,7 @@ function Dashboard() {
                 <strong>Existing Patients:</strong> Simply lookup using their Patient ID, mobile number, or full name in the booking scheduler to prevent redundant records.
               </p>
               <p className="bg-slate-50 p-2.5 rounded border border-slate-100">
-                <strong>Real-Time Updates:</strong> This system uses Socket.IO. When other receptionists book, cancel, or modify appointments, your active list and slot grid refreshes immediately without any manual reload!
-              </p>
-              <p className="bg-slate-50 p-2.5 rounded border border-slate-100">
-                <strong>Double Booking Check:</strong> Backed by atomicity, simultaneous booking attempts on the exact same slots trigger safe rollbacks preventing overlap.
+                <strong>Real-Time Updates:</strong> When other receptionists book, cancel, or modify appointments, your active list and slot grid refreshes immediately without any manual reload!
               </p>
             </div>
           </div>
